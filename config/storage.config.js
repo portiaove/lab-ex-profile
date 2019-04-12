@@ -9,7 +9,12 @@ cloudinary.config({
 })
 
 const storage = cloudinaryStorage({
-  // TODO: cloudinary storage configuration; allowed file types, unique file name...
+  cloudinary: cloudinary,
+  folder: 'profile-avatars',
+  allowFormats: ['jpg', 'png'],
+  filename: (req, file, next) => {
+    next(null, `${Date.now()}${file.originalname}`)
+  }
 })
 
 module.exports = multer({ storage });

@@ -22,16 +22,42 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [8, 'Password needs at last 8 chars']
-  }
-  // TODO: avatar & social login attrs
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'guess'],
+    default: 'guess'
+  },
+  social: {
+    googleId: {
+      type: String,
+      unique: true
+    }
+  },
+  avatarURL: String
 }, { timestamps: true })
 
-userSchema.pre('save', function(next) {
+userSchema.pre('save', function (next) {
   const user = this;
-  // TODO: password hashing if necessary
+
+  if (user.isModified('password')) {
+    bcrypt.genSalt(SALT_WORK_FACTOR)
+      .then(salt => {
+        return bcrypt.hash(user.password, salt)
+          .then(hash => {
+            user.password = hash;
+            next();
+          });
+      })
+      .catch(error => next(error));
+  } else {
+    next();
+  }
 });
 
-// TODO: checkPassword method
+userSchema.methods.checkPassword = function (password) {
+  return bcrypt.compare(password, this.password);
+}
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

@@ -17,7 +17,13 @@ module.exports.doRegister = (req, res, next) => {
 
   User.findOne({ email: req.body.email })
     .then(user => {
-      // TODO: save user & redirect to login
+      if (user) {
+        renderWithErrors({ email: 'Email already registered' })
+      } else {
+        user = new User(req.body);
+        return user.save()
+          .then(user => res.redirect('/login'))
+      }
     })
     .catch(error => {
       if (error instanceof mongoose.Error.ValidationError) {
@@ -33,11 +39,40 @@ module.exports.login = (req, res, next) => {
 }
 
 module.exports.doLogin = (req, res, next) => {
-  // TODO: passport local-auth authentication & redirect to /profile
+  passport.authenticate('local-auth', (error, user, validation) => {
+    if (error) {
+      next(error);
+    } else if (!user) {
+      res.render('auth/login', {
+        user: req.body,
+        errors: validation
+      })
+    } else {
+      return req.login(user, (error) => {
+        if (error) {
+          next(error)
+        } else {
+          res.redirect('/profile')
+        }
+      })
+    }
+  })(req, res, next);
 }
 
 module.exports.loginWithGoogleCallback = (req, res, next) => {
-  // TODO: passport google-auth authentication & redirect to /profile
+  passport.authenticate(`google-auth`, (error, user) => {
+    if (error) {
+      next(error);
+    } else {
+      req.login(user, (error) => {
+        if (error) {
+          next(error)
+        } else {
+          res.redirect('/profile');
+        }
+      })
+    }
+  })(req, res, next);
 }
 
 module.exports.profile = (req, res, next) => {
@@ -45,10 +80,31 @@ module.exports.profile = (req, res, next) => {
 }
 
 module.exports.doProfile = (req, res, next) => {
-  // TODO: edit connect user profile, remember password is not a required field and the avatarURL
-  // is provided by the storage configuration
+  if (!req.body.password) {
+    delete req.body.password;
+  }
+
+  if (req.file) {
+    req.body.avatarURL = req.file.secure_url;
+  }
+
+  const user = req.user;
+  Object.assign(user, req.body);
+  user.save()
+    .then(user => res.redirect('/profile'))
+    .catch(error => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        res.render('auth/profile', {
+          user: req.body,
+          errors: error.errors
+        })
+      } else {
+        next(error);
+      }
+    });
 }
 
 module.exports.logout = (req, res, next) => {
-  // TODO: logout and redirect to login
+  req.logout();
+  res.redirect('/login');
 }
