@@ -27,7 +27,7 @@ Now you are ready to start 🚀
 
 ### Iteration 1 | Register (email & password)
 
-We need register users in our system using many authenticators, for now we try to register user using local auth (email & password)
+We need to register users in our system using many authenticators, for now we will try to register using local auth (email & password)
 
 #### Dependencies
 - bcrypt (password hashing)
@@ -37,11 +37,11 @@ We need register users in our system using many authenticators, for now we try t
 - controllers/auth.controller.js (register & doRegister)
 - models/user.model.js (pre-save hook)
 
-> Remember we need store user password encrypted and redirect to login at the end.
+> Remember we need to store the user password encrypted and redirect to login at the end.
 
 ### Iteration 2 | Login (email & password)
 
-Authentica users using user & password (ignore login with google button for now). Complete passport configuration with local-auth strategy, setup session cookie flags & implement auth.controller login business logic.
+Authentica users using email & password (ignore login with google button for now). Complete passport configuration with local-auth strategy, setup session cookie flags & implement auth.controller login business logic.
 
 #### Dependencies
 - passport
@@ -61,14 +61,14 @@ Authentica users using user & password (ignore login with google button for now)
 
 ### Iteration 3 | Authenticated middleware
 
-The most important step of authentication is protect all private routes, at this application only /profile path is private.
+The most important step of authentication is to protect all private routes, in this application only /profile path's are private.
 Complete secure middleware and use it at profile routes.
 
 #### Involved sources
 - middlewared/secure.min.js (authentication middlewares)
 - routes/auth.routes.js (profile routes)
 
-> Redirec to login if the user is not logged in.
+> Redirect to login if the user is not logged in.
 
 ### Iteration 4 | User profile
 
@@ -85,7 +85,7 @@ Add new attribute `avatarURL` to the user schema and allow to edit user informat
 - models/user.model.js (avatarURL property)
 - routes/auth.routes.js (storage middleware at profile)
 
-> When we send files at the request the form enctype must be `multipart/form-data` 
+> When we send files in the request the form enctype must be `multipart/form-data` 
 
 ### Iteration 4 | Login with Google
 
