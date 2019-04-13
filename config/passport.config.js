@@ -4,11 +4,15 @@ const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
  
 passport.serializeUser((user, next) => {
-  // TODO: write user unique information to cookie
+  next(null, user.id)
+  // DONE: write user unique information to cookie
 })
 
 passport.deserializeUser((id, next) => {
-  // TODO: read user from cookie
+  User.findById(id)
+  .then(user => next(null, user))
+  .catch(next)
+   // DONE: read user from cookie
 })
 
 passport.use('local-auth', new LocalStrategy({
