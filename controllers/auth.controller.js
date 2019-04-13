@@ -25,7 +25,7 @@ module.exports.doRegister = (req, res, next) => {
         return user.save()
         .then (user => res.redirect ('/login'))
       }
-      // TODO: save user & redirect to login
+      // DONE: save user & redirect to login
     })
     .catch(error => {
       if (error instanceof mongoose.Error.ValidationError) {
@@ -41,6 +41,26 @@ module.exports.login = (req, res, next) => {
 }
 
 module.exports.doLogin = (req, res, next) => {
+  passport.authenticate("local-auth", (errorAuth, user, validation) => {
+    if (errorAuth) {
+      next(errorAuth);
+    } else if (!user) {
+      res.render("auth/login",{
+        user: req.body,
+        errors: validation,
+      })
+    } else{
+      return req.login(user, (errorLogin)=>{
+        if(errorLogin){
+          next(errorLogin)
+        }else{
+          res.redirect("/users")
+        }
+      })
+    }
+  })(req,res,next);
+
+
   // TODO: passport local-auth authentication & redirect to /profile
 }
 
