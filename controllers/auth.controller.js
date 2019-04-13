@@ -17,6 +17,14 @@ module.exports.doRegister = (req, res, next) => {
 
   User.findOne({ email: req.body.email })
     .then(user => {
+      if(user) {
+        renderWithErrors({email:'esto existe manco'})
+ }
+      else{
+        user= new User(req.body);
+        return user.save()
+        .then (user => res.redirect ('/login'))
+      }
       // TODO: save user & redirect to login
     })
     .catch(error => {
